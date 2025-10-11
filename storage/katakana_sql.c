@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     char *sql = "CREATE TABLE katakana_mode ("
                 "ID INT PRIMARY KEY NOT NULL, "
                 "Katakana TEXT NOT NULL, "
-                "English TEXT NOT NULL );";
+                "Romaji TEXT NOT NULL );";
     char *errormessage;
 
     exit = sqlite3_open(filename, &db);
@@ -30,3 +30,28 @@ int main(int argc, char *argv[])
     sqlite3_close(db);
     return 0;
 }
+
+/*
+int i = 0;
+char word[]; // wchar ??
+while(feof == 0)
+{
+    fgets(word, 100, outfile);
+
+    // Do this or find a way where the sql statement takes a variable
+
+    strcpy(word, ""); // Extra stuff needed for a sql statement
+
+    strcpy(sql, word); // Create the completed sql statement
+
+    if (i % 2 == 0)
+    {
+        sqlite3.exec() // Insert to the hirigana portion of the database
+    }
+    else
+    {
+        sqlite3.exec() // Insert to the english portion of the database
+    }
+}
+
+*/
