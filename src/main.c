@@ -13,9 +13,10 @@ int main(int argc, char* argv[])
     int start_time, end_time, total_time;
     char user_input[10];
     char question[50];
-    char user_answer[50];
+    char user_romaji[50];
+    char user_english[50] = "\0";
     char correct_romaji[50];
-    char correct_english[50];
+    char correct_english[50] = "\0";
     struct node *head = NULL;
     struct node *tail = NULL;
 
@@ -67,6 +68,11 @@ int main(int argc, char* argv[])
             random = randomNum(mode, upper_hir, lower_hir, upper_kat, lower_kat, &both_mode);
         }
 
+        if (random == -1)
+        {
+            ret_val = -1;
+        }
+
         database_type = 0;
         if (getData(both_mode, random, database_type, question, 50) == -1)
         {
@@ -97,17 +103,17 @@ int main(int argc, char* argv[])
 
             printf("Question %d: %s\n", i + 1, question); // Prints a random question from the database
 
-            fgets(user_answer, 50, stdin);
+            fgets(user_romaji, 50, stdin);
 
             end_time = time(NULL);
 
             total_time = difftime(end_time, start_time);
             printf("Time spent: %d\n", total_time);
             
-            toLower(user_answer, strlen(user_answer));
+            toLower(user_romaji, strlen(user_romaji));
             clearBuffer();
 
-            if(strncmp(user_answer, correct_romaji, 50) == 0)
+            if(strncmp(user_romaji, correct_romaji, 50) == 0)
             {
                 curr_score = calculatePoints(total_time);
                 total_score += curr_score;
@@ -123,16 +129,16 @@ int main(int argc, char* argv[])
 
                 start_time = time(NULL);
 
-                fgets(user_answer, 50, stdin);
+                fgets(user_english, 50, stdin);
 
                 end_time = time(NULL);
 
                 total_time = difftime(end_time, start_time);
 
-                toLower(user_answer, strlen(user_answer));
+                toLower(user_english, strlen(user_english));
                 clearBuffer();
 
-                if (strncmp(user_answer, correct_english, 50) == 0)
+                if (strncmp(user_english, correct_english, 50) == 0)
                 {
                     curr_score = calculatePoints((int)total_time);
                     total_score += curr_score;
@@ -143,10 +149,10 @@ int main(int argc, char* argv[])
                 }
             }
 
-            createNode(head, tail, random, both_mode, user_answer, curr_score, 50);
+            createNode(head, tail, question, correct_romaji, correct_english, user_romaji, user_english, curr_score, 50);
         }
     }
 
-    results(head, total_score);
+    results(head, total_score, mode);
     return ret_val;
 }

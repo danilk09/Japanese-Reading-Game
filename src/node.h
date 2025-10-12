@@ -1,8 +1,10 @@
 struct node
 {
-    int             id;
-    int             mode;
+    char            question[50];
+    char            correct_romaji[50];
+    char            correct_english[50];
+    char            user_romaji[50];
+    char            user_english[50];
     int             points;
-    char            user_answer[50];
     struct node*    next;
 };

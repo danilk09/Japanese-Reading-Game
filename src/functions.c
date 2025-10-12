@@ -63,17 +63,17 @@ int chooseMode(int *mode, char *user_input, int length, int *upper_hir, int *low
     else if(strncmp("both characters", user_input, length))
     {
         mode = 4;
-        *upper_hir = 0; // Placeholders for when I create katakana database
+        *upper_hir = 104; // Placeholders for when I create katakana database
         *upper_kat = 0;
-        *lower_hir = 0;
+        *lower_hir = 1;
         *lower_kat = 0;
     }    
     else if(strncmp("both words", user_input, length))
     {
         mode = 5;
-        *upper_hir = 0; // Placeholders for when I create katakana database
+        *upper_hir = 273; // Placeholders for when I create katakana database
         *upper_kat = 0;
-        *lower_hir = 0;
+        *lower_hir = 105;
         *lower_kat = 0;
     }
     else
@@ -89,10 +89,9 @@ Creates a node that stores information about the current
 question the user answered. Alwyas adds the node to the end 
 of the list.
 */
-int createNode(struct node *head, struct node *tail, int id, int mode, int points, char user_answer[], int size)
+int createNode(struct node *head, struct node *tail, char question[], char correct_romaji[], char correct_english[], char user_romaji[], char user_english[], int points, int size)
 {
     int ret_val = 0;
-    struct node *iter = head;
 
     struct node *new_node = (struct node *)malloc(sizeof(struct node));
     if (new_node == NULL)
@@ -102,10 +101,12 @@ int createNode(struct node *head, struct node *tail, int id, int mode, int point
 
     if (ret_val == 0)
     {
-        new_node->id = id;
-        new_node->mode = mode;
+        strncpy(new_node->question, question, size);
+        strncpy(new_node->correct_romaji, correct_romaji, size);
+        strncpy(new_node->correct_english, correct_english, size);
+        strncpy(new_node->user_romaji, user_romaji, size);
+        strncpy(new_node->user_english, user_english, size);
         new_node->points = points;
-        strncpy(new_node->user_answer, user_answer, size);
         new_node->next = NULL;
 
         if(head == NULL && tail == NULL)
@@ -219,9 +220,36 @@ select a random question from the selected database.
 */
 int randomNum(int mode, int upper_hir, int lower_hir, int upper_kat, int lower_kat, int *both_mode)
 {
-    int rand;
+    int random_num;
 
-    return rand;
+    if (mode == 0 || mode == 1)
+    {
+        random_num = rand() % (upper_hir - lower_hir) + lower_hir;
+    }
+    else if (mode == 2 || mode == 3)
+    {
+        random_num = rand() % (upper_kat - lower_kat) + lower_kat;
+    }
+    else if (mode == 4 || mode == 5)
+    {
+        random_num = rand();
+        if (random_num % 2 == 0)
+        {
+            *both_mode = 0;
+            random_num = rand() % (upper_hir - lower_hir) - lower_hir;
+        }
+        else
+        {
+            *both_mode = 1;
+            random_num = rand() % (upper_kat - lower_kat) - lower_kat;
+        }
+    }
+    else
+    {
+        random_num = -1;
+    }
+
+    return random_num;
 }
 
 /*
@@ -230,9 +258,31 @@ to the question, the user's answer to the question, how
 many points the user gained for each question, as well as
 their final score.
 */
-void results(struct node *head, int final_score)
+void results(struct node *head, int final_score, int mode)
 {
+    int i = 0;
+    struct node *iter = head;
 
+    printf("Here Are Your Results\n"
+           "=====================\n");
+
+    while (iter != NULL)
+    {
+        printf("Question %d: %s\n", i + 1, iter->question);
+        printf("Correct Romaji: %s\n", iter->correct_romaji);
+        printf("Your Romaji Answer: %s\n", i + 1, iter->user_romaji);
+        if (mode == 1 || mode == 3 || mode == 5)
+        {
+            printf("Correct English Meaning: %s\n", iter->correct_english);
+            printf("Your English Meaning Answer: %s\n", iter->user_english);
+        }
+        printf("Points for Question %d: %d\n", i + 1, iter->points);
+
+        iter = iter->next;
+    }
+
+    printf("Your Final Score is: %d\n", final_score);
+    printf("Thank You For Playing!");
 }
 
 /*
