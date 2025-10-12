@@ -3,190 +3,150 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "store.h"
-
-void clearBuffer();
-void chooseMode(int *, char *, int);
-int randomNum(int, int);
-void toLower(char *, int);
+#include "functions.h"
+#include "node.h"
 
 int main(int argc, char* argv[])
 {
-    int i, random, length, mode, curr_score, total_score = 0, total_questions = 10, boolean = 0;
+    int i, random, database_type, length, upper_hir, lower_hir, upper_kat, lower_kat, mode, both_mode, curr_score;
+    int ret_val = 0, total_score = 0, boolean = 0, total_questions = 10;
     int start_time, end_time, total_time;
     char user_input[10];
     char question[50];
-    char correct_answer[50];
     char user_answer[50];
-    node *head = NULL;
-    node *tail = NULL;
+    char correct_romaji[50];
+    char correct_english[50];
+    struct node *head = NULL;
+    struct node *tail = NULL;
 
     printf("Welcome to the Japanese Reading Game!\n"
-    "Type and enter the romaji version of the Japanese word as quickly as possible\n"
-    "The quicker you type, the more points you gain!\n"
-    "Please choose one of the game options below to start the game and determine what\n"
-    "type of questions will be asked\n"
-    "Hirigana | Katakana | Both\n");
+        "=====================================\n"
+        "You can either practice hirigana and katakana characters or reading hirigana and katakana words.\n"
+        "Type and enter the romaji version of the Japanese character/word as quickly as possible\n"
+        "The quicker you type, the more points you gain! Each question is worth up to 20 points.\n"
+        "Bonus questions about the meaning of the word in English will be provided at the end!\n"
+        "Note: I made the English meanings as general as possible. If the game says you got it\n"
+        "wrong when you really didn't, then please forgive me!\n"
+        "Please choose one of the game options below to start the game and determine what\n"
+        "type of questions will be asked\n"
+        "Hirigana Characters | Hirigana Words | Katakana Characters | Katakana Words | Both Characters | Both Words\n\n");
 
     while(boolean == 0)
     {
         fgets(user_input, 10, stdin);
         length = strlen(user_input) - 1;
         toLower(user_input, length);
-        chooseMode(&mode, user_input, length);
+        if (chooseMode(&mode, user_input, length, &upper_hir, &lower_hir, &upper_kat, &lower_kat) == -1)
+        {
+            printf("Please select a valid mode: \n");
+        }
         clearBuffer();
     }
 
-    printf("Game starts in...\n");
+    printf("\nGame starts in...\n");
     for(i = 3; i > 0; i--)
     {
         sleep(1);
-        printf("%d", i);
+        printf("%d...\n", i);
     }
     printf("Start!\n"
-    "_______________________\n")
+    "_______________________\n\n");
 
-    for(i = 0; i < total_questions; i++)
+    for(i = 0 && ret_val == 0; i < total_questions; i++)
     {
-        random = randomNum(100, 1); // Temporary placeholder for generating a random number
-
-        question = TEMP; // Store the random question from the database in the char array
-        correct_answer = TEMP; // Store the correct answer of the random question from the database
-
-        start_time = time(NULL);
-
-        printf("Question %d: %s\n", i + 1, question) // Prints a random question from the database
-
-        fgets(user_answer, 50, stdin);
-
-        end_time = time(NULL);
-
-        total_time = difftime(end_time, start_time);
-
-        if(strcmp(user_answer, correct_answer) == 0)
+        if (mode == 0 || mode == 1)
         {
-            curr_score = calculatePoints(total_time);
-            total_score += curr_score;
+            random = randomNum(mode, upper_hir, lower_hir, 0, 0, &both_mode); 
+        }
+        else if (mode == 2 || mode == 3)
+        {
+            random = randomNum(mode, 0, 0, upper_kat, lower_kat, &both_mode); 
         }
         else
         {
-            curr_score = 0;
+            random = randomNum(mode, upper_hir, lower_hir, upper_kat, lower_kat, &both_mode);
         }
 
+        database_type = 0;
+        if (getData(both_mode, random, database_type, question, 50) == -1)
+        {
+            printf("Error with obtaining the question from the database");
+            ret_val = -1;
+        }
 
-        createNode(head, tail, question, correct_answer, user_answer, curr_score);
+        database_type = 1;
+        if (getData(both_mode, random, database_type, correct_romaji, 50) == -1)
+        {
+            printf("Error with obtaining the correct romaji from the database");
+            ret_val = -1;
+        }
+
+        if (mode == 1 || mode == 3 || mode == 5)
+        {
+            database_type = 2;
+            if (getData(both_mode, random, database_type, correct_english, 50) == -1)
+            {
+                printf("Error with obtaining the correct English from the database");
+                ret_val = -1;
+            }
+        }
+
+        if (ret_val == 0)
+        {
+            start_time = time(NULL);
+
+            printf("Question %d: %s\n", i + 1, question); // Prints a random question from the database
+
+            fgets(user_answer, 50, stdin);
+
+            end_time = time(NULL);
+
+            total_time = difftime(end_time, start_time);
+            printf("Time spent: %d\n", total_time);
+            
+            toLower(user_answer, strlen(user_answer));
+            clearBuffer();
+
+            if(strncmp(user_answer, correct_romaji, 50) == 0)
+            {
+                curr_score = calculatePoints(total_time);
+                total_score += curr_score;
+            }
+            else
+            {
+                curr_score = 0;
+            }
+
+            if (mode == 1 || mode == 3 || mode == 5)
+            {
+                printf("Bonus Question! English meaning:\n");
+
+                start_time = time(NULL);
+
+                fgets(user_answer, 50, stdin);
+
+                end_time = time(NULL);
+
+                total_time = difftime(end_time, start_time);
+
+                toLower(user_answer, strlen(user_answer));
+                clearBuffer();
+
+                if (strncmp(user_answer, correct_english, 50) == 0)
+                {
+                    curr_score = calculatePoints((int)total_time);
+                    total_score += curr_score;
+                }
+                else
+                {
+                    curr_score = 0;
+                }
+            }
+
+            createNode(head, tail, random, both_mode, user_answer, curr_score, 50);
+        }
     }
 
     results(head, total_score);
-    
-}
-
-/*
-Calculates the points the user achieved based on how much time the
-user spent on answering the question
-*/
-int calculatePoints(int time)
-{
-    int score;
-    score = (20 - (time/2));
-    return score;
-}
-
-/*
-Clears the buffer
-*/
-void clearBuffer()
-{
-
-}
-
-/*
-Selects the mode of the game depeneding on what the user
-chose. This will specify what database to take information
-from.
-*/
-void chooseMode(int *mode, char *user_input, int length)
-{
-    if(strncmp("hirigana", user_input, length))
-    {
-        mode = 0;
-    }
-    else if(strncmp("katakana", user_input, length))
-    {
-        mode = 1;
-    }
-    else if(strncmp("both", user_input, length))
-    {
-        mode = 2;
-    }
-    else
-    {
-        printf("Please select a valid option\n");
-    }
-}
-
-/*
-Creates a node that stores information about the current
-question the user answered. Alwyas adds the node to the end 
-of the list.
-*/
-void *createNode(node *head, node *tail, char question[], char correct_answer[], char user_answer[], int points[])
-{
-    node *iter = end;
-
-    node *new_node = (node *)malloc(sizeof(node));
-    new_node->quetsion = question;
-    new_node->correct_answer = correct_answer;
-    new_node->user_answer = user_answer;
-    new_node->points = points;
-    new_node->next = NULL;
-
-    if(start == NULL && tail == NULL)
-    {
-        head = &new_node;
-        tail = &new_node;
-    }
-    else
-    {
-        tail->next = &new_node;
-    }
-}
-
-/*
-Generates a random number. This number will be used to
-select a random question from the selected database.
-*/
-int randomNum(int upper, int lower)
-{
-    int rand;
-
-    return rand;
-}
-
-/*
-Prints the results of each question, the correct answer
-to the question, the user's answer to the question, how
-many points the user gained for each question, as well as
-their final score.
-*/
-void results(node *head, int final_score)
-{
-
-}
-
-/*
-Changes the given input into all lower case letters by
-changing the characters ASCII value.
-*/
-void toLower(char *input, int size)
-{
-    int i;
-    
-    for(i = 0; i < size; i++)
-    {
-        if(input[i] > 40 && input[i] < 91)
-        {
-            input[i] += 32;
-        }
-    } 
+    return ret_val;
 }

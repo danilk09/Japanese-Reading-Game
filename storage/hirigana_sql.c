@@ -94,7 +94,6 @@ int insert_data(char db_name[], char filename[], sqlite3 *db, int exit)
 
     exit = sqlite3_open(db_name, &db);
 
-
     if (exit)
     {
         ret_val = -1;
@@ -137,10 +136,16 @@ int insert_data(char db_name[], char filename[], sqlite3 *db, int exit)
                 ret_val = -1;
             }   
 
-            sqlite3_reset(stmt);
-            sqlite3_clear_bindings(stmt);
+            if (ret_val == 0)
+            {
+                sqlite3_reset(stmt);
+                sqlite3_clear_bindings(stmt);
+            }
         }
-        sqlite3_finalize(stmt);
+        if (ret_val == 0)
+        {
+            sqlite3_finalize(stmt);
+        }
     }
 
     if (ret_val == 0)
