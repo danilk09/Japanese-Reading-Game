@@ -1,3 +1,4 @@
+#include <locale.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -18,6 +19,8 @@ int main(int argc, char* argv[])
     char correct_english[50] = "\0";
     struct node *head = NULL;
     struct node *tail = NULL;
+
+    setlocale(LC_ALL, "en_US.UTF-8");
 
     printf("Welcome to the Japanese Reading Game!\n"
         "=====================================\n"
@@ -44,7 +47,7 @@ int main(int argc, char* argv[])
         {
             boolean = 1;
         }
-        clearBuffer();
+        //clearBuffer();
     }
 
     printf("\nGame starts in...\n");
@@ -77,20 +80,20 @@ int main(int argc, char* argv[])
         }
 
         database_type = 0;
-        if (getData(both_mode, random, database_type, question, 50) == -1)
+        if (ret_val == 0 && getData(both_mode, random, database_type, question, 50) == -1)
         {
             printf("Error with obtaining the question from the database\n");
             ret_val = -1;
         }
 
         database_type = 1;
-        if (getData(both_mode, random, database_type, correct_romaji, 50) == -1)
+        if (ret_val == 0 && getData(both_mode, random, database_type, correct_romaji, 50) == -1)
         {
             printf("Error with obtaining the correct romaji from the database\n");
             ret_val = -1;
         }
 
-        if (mode == 1 || mode == 3 || mode == 5)
+        if (ret_val == 0 && (mode == 1 || mode == 3 || mode == 5))
         {
             database_type = 2;
             if (getData(both_mode, random, database_type, correct_english, 50) == -1)
@@ -102,9 +105,9 @@ int main(int argc, char* argv[])
 
         if (ret_val == 0)
         {
-            start_time = time(NULL);
-
             printf("Question %d: %s\n", i + 1, question); // Prints a random question from the database
+
+            start_time = time(NULL);
 
             fgets(user_romaji, 50, stdin);
 
@@ -114,7 +117,7 @@ int main(int argc, char* argv[])
             printf("Time spent: %d\n", total_time);
             
             toLower(user_romaji, strlen(user_romaji));
-            clearBuffer();
+            //clearBuffer();
 
             if(strncmp(user_romaji, correct_romaji, 50) == 0)
             {
@@ -139,7 +142,7 @@ int main(int argc, char* argv[])
                 total_time = difftime(end_time, start_time);
 
                 toLower(user_english, strlen(user_english));
-                clearBuffer();
+                //clearBuffer();
 
                 if (strncmp(user_english, correct_english, 50) == 0)
                 {

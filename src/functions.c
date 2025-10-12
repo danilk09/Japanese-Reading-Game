@@ -129,14 +129,14 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
     int ret_val = 0;
     sqlite3 *db;
     sqlite3_stmt *stmt;
-    char db_name[20];
+    char db_name[100];
     char *database_info;
     int exit;
     char *sql;
 
     if (both_mode == 0)
     {
-        strcpy(db_name, "hirigana.db");
+        strcpy(db_name, "../../storage/output/hirigana.db");
         if (database_type == 0)
         {
             sql = "SELECT Hirigana from hirigana_mode WHERE id = ?";
@@ -156,7 +156,7 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
     }
     else
     {
-        strcpy(db_name, "katakana.db");
+        strcpy(db_name, "../../storage/output/katakana.db");
         if (database_type == 0)
         {
             sql = "SELECT Katakana from katakana_mode WHERE id = ?";
@@ -178,6 +178,7 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
     exit = sqlite3_open(db_name, &db);
     if (exit)
     {
+        printf("Got here: %s\n", sqlite3_errmsg(db));
         ret_val = -1;
     }
 
@@ -186,6 +187,7 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
         exit = sqlite3_prepare_v2(db, sql, -1., &stmt, NULL);
         if (exit != SQLITE_OK)
         {
+            printf("Got here: %s\n", sqlite3_errmsg(db));
             sqlite3_close(db);
             ret_val = -1;
         }
@@ -196,6 +198,7 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
             exit = sqlite3_step(stmt);
             if (exit != SQLITE_ROW)
             {
+                printf("Got here: %s\n", sqlite3_errmsg(db));
                 sqlite3_close(db);
                 ret_val = -1;
             }
@@ -227,10 +230,12 @@ int randomNum(int mode, int upper_hir, int lower_hir, int upper_kat, int lower_k
     if (mode == 0 || mode == 1)
     {
         random_num = rand() % (upper_hir - lower_hir) + lower_hir;
+        *both_mode = 0;
     }
     else if (mode == 2 || mode == 3)
     {
         random_num = rand() % (upper_kat - lower_kat) + lower_kat;
+        *both_mode = 1;
     }
     else if (mode == 4 || mode == 5)
     {
