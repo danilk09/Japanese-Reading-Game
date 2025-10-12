@@ -807,6 +807,7 @@ kuru
 to come
 おしえる
 oshieru
+to teach
 でも
 demo
 but

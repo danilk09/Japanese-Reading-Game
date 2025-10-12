@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sqlite3.h>
 
@@ -36,41 +37,41 @@ int chooseMode(int *mode, char *user_input, int length, int *upper_hir, int *low
 {
     int ret_val = 0;
 
-    if(strncmp("hirigana characters", user_input, length))
+    if(strncmp("hirigana characters", user_input, length) == 0)
     {
-        mode = 0;
+        *mode = 0;
         *upper_hir = 104;
         *lower_hir = 1;
     }
-    else if(strncmp("hirigana words", user_input, length))
+    else if(strncmp("hirigana words", user_input, length) == 0)
     {
-        mode = 1;
+        *mode = 1;
         *upper_hir = 273;
         *lower_hir = 105;
     }
-    else if(strncmp("katakana characters", user_input, length))
+    else if(strncmp("katakana characters", user_input, length) == 0)
     {
-        mode = 2;
+        *mode = 2;
         *upper_kat = 0; // Placeholders for when I create katakana database
         *lower_kat = 0;
     }
-    else if(strncmp("katakana words", user_input, length))
+    else if(strncmp("katakana words", user_input, length) == 0)
     {
-        mode = 3;
+        *mode = 3;
         *upper_kat = 0; // Placeholders for when I create katakana database
         *lower_kat = 0;
     }
-    else if(strncmp("both characters", user_input, length))
+    else if(strncmp("both characters", user_input, length) == 0)
     {
-        mode = 4;
+        *mode = 4;
         *upper_hir = 104; // Placeholders for when I create katakana database
         *upper_kat = 0;
         *lower_hir = 1;
         *lower_kat = 0;
     }    
-    else if(strncmp("both words", user_input, length))
+    else if(strncmp("both words", user_input, length) == 0)
     {
-        mode = 5;
+        *mode = 5;
         *upper_hir = 273; // Placeholders for when I create katakana database
         *upper_kat = 0;
         *lower_hir = 105;
@@ -111,12 +112,12 @@ int createNode(struct node *head, struct node *tail, char question[], char corre
 
         if(head == NULL && tail == NULL)
         {
-            head = &new_node;
-            tail = &new_node;
+            head = new_node;
+            tail = new_node;
         }
         else
         {
-            tail->next = &new_node;
+            tail->next = new_node;
         }
     }
 
@@ -129,7 +130,7 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
     sqlite3 *db;
     sqlite3_stmt *stmt;
     char db_name[20];
-    char *error_message;
+    char *database_info;
     int exit;
     char *sql;
 
@@ -200,7 +201,8 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
             }
             else
             {
-                strncpy(info, sqlite3_column_text(stmt, 0), size);
+                database_info = sqlite3_column_text(stmt, 0);
+                strncpy(info, database_info, size);
             }
 
             if (ret_val == 0)
@@ -270,7 +272,7 @@ void results(struct node *head, int final_score, int mode)
     {
         printf("Question %d: %s\n", i + 1, iter->question);
         printf("Correct Romaji: %s\n", iter->correct_romaji);
-        printf("Your Romaji Answer: %s\n", i + 1, iter->user_romaji);
+        printf("Your Romaji Answer: %s\n", iter->user_romaji);
         if (mode == 1 || mode == 3 || mode == 5)
         {
             printf("Correct English Meaning: %s\n", iter->correct_english);

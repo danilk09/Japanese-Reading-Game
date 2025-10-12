@@ -4,7 +4,6 @@
 #include <unistd.h>
 
 #include "functions.h"
-#include "node.h"
 
 int main(int argc, char* argv[])
 {
@@ -34,12 +33,16 @@ int main(int argc, char* argv[])
 
     while(boolean == 0)
     {
-        fgets(user_input, 10, stdin);
+        fgets(user_input, 30, stdin);
         length = strlen(user_input) - 1;
         toLower(user_input, length);
         if (chooseMode(&mode, user_input, length, &upper_hir, &lower_hir, &upper_kat, &lower_kat) == -1)
         {
             printf("Please select a valid mode: \n");
+        }
+        else
+        {
+            boolean = 1;
         }
         clearBuffer();
     }
@@ -76,14 +79,14 @@ int main(int argc, char* argv[])
         database_type = 0;
         if (getData(both_mode, random, database_type, question, 50) == -1)
         {
-            printf("Error with obtaining the question from the database");
+            printf("Error with obtaining the question from the database\n");
             ret_val = -1;
         }
 
         database_type = 1;
         if (getData(both_mode, random, database_type, correct_romaji, 50) == -1)
         {
-            printf("Error with obtaining the correct romaji from the database");
+            printf("Error with obtaining the correct romaji from the database\n");
             ret_val = -1;
         }
 
@@ -92,7 +95,7 @@ int main(int argc, char* argv[])
             database_type = 2;
             if (getData(both_mode, random, database_type, correct_english, 50) == -1)
             {
-                printf("Error with obtaining the correct English from the database");
+                printf("Error with obtaining the correct English from the database\n");
                 ret_val = -1;
             }
         }
