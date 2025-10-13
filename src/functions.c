@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sqlite3.h>
+#include <time.h>
 
 #include "node.h"
 
@@ -90,8 +91,9 @@ Creates a node that stores information about the current
 question the user answered. Alwyas adds the node to the end 
 of the list.
 */
-int createNode(struct node *head, struct node *tail, char question[], char correct_romaji[], char correct_english[], char user_romaji[], char user_english[], int points, int size)
+int createNode(struct node **head, struct node **tail, char question[], char correct_romaji[], char correct_english[], char user_romaji[], char user_english[], int points, int size)
 {
+    printf("Got here 0\n");
     int ret_val = 0;
 
     struct node *new_node = (struct node *)malloc(sizeof(struct node));
@@ -110,14 +112,15 @@ int createNode(struct node *head, struct node *tail, char question[], char corre
         new_node->points = points;
         new_node->next = NULL;
 
-        if(head == NULL && tail == NULL)
+        if(*head == NULL && *tail == NULL)
         {
-            head = new_node;
-            tail = new_node;
+            *head = new_node;
+            *tail = new_node;
         }
         else
         {
-            tail->next = new_node;
+            (*tail)->next = new_node;
+            *tail = (*tail)->next;
         }
     }
 
@@ -187,7 +190,6 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
         exit = sqlite3_prepare_v2(db, sql, -1., &stmt, NULL);
         if (exit != SQLITE_OK)
         {
-            printf("Got here: %s\n", sqlite3_errmsg(db));
             sqlite3_close(db);
             ret_val = -1;
         }
@@ -198,7 +200,6 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
             exit = sqlite3_step(stmt);
             if (exit != SQLITE_ROW)
             {
-                printf("Got here: %s\n", sqlite3_errmsg(db));
                 sqlite3_close(db);
                 ret_val = -1;
             }
@@ -227,14 +228,16 @@ int randomNum(int mode, int upper_hir, int lower_hir, int upper_kat, int lower_k
 {
     int random_num;
 
+    srand(time(NULL));
+
     if (mode == 0 || mode == 1)
     {
-        random_num = rand() % (upper_hir - lower_hir) + lower_hir;
+        random_num = rand() % (upper_hir - lower_hir + 1) + lower_hir;
         *both_mode = 0;
     }
     else if (mode == 2 || mode == 3)
     {
-        random_num = rand() % (upper_kat - lower_kat) + lower_kat;
+        random_num = rand() % (upper_kat - lower_kat + 1) + lower_kat;
         *both_mode = 1;
     }
     else if (mode == 4 || mode == 5)
@@ -243,12 +246,12 @@ int randomNum(int mode, int upper_hir, int lower_hir, int upper_kat, int lower_k
         if (random_num % 2 == 0)
         {
             *both_mode = 0;
-            random_num = rand() % (upper_hir - lower_hir) - lower_hir;
+            random_num = rand() % (upper_hir - lower_hir + 1) - lower_hir;
         }
         else
         {
             *both_mode = 1;
-            random_num = rand() % (upper_kat - lower_kat) - lower_kat;
+            random_num = rand() % (upper_kat - lower_kat + 1) - lower_kat;
         }
     }
     else
@@ -270,25 +273,26 @@ void results(struct node *head, int final_score, int mode)
     int i = 0;
     struct node *iter = head;
 
-    printf("Here Are Your Results\n"
+    printf("\nHere Are Your Results\n"
            "=====================\n");
 
     while (iter != NULL)
     {
-        printf("Question %d: %s\n", i + 1, iter->question);
-        printf("Correct Romaji: %s\n", iter->correct_romaji);
-        printf("Your Romaji Answer: %s\n", iter->user_romaji);
+        printf("\nQuestion %d: %s", i + 1, iter->question);
+        printf("Correct Romaji: %s", iter->correct_romaji);
+        printf("Your Romaji Answer: %s", iter->user_romaji);
         if (mode == 1 || mode == 3 || mode == 5)
         {
-            printf("Correct English Meaning: %s\n", iter->correct_english);
-            printf("Your English Meaning Answer: %s\n", iter->user_english);
+            printf("Correct English Meaning: %s", iter->correct_english);
+            printf("Your English Meaning Answer: %s", iter->user_english);
         }
         printf("Points for Question %d: %d\n", i + 1, iter->points);
 
         iter = iter->next;
+        i += 1;
     }
 
-    printf("Your Final Score is: %d\n", final_score);
+    printf("\nYour Final Score is: %d\n", final_score);
     printf("Thank You For Playing!");
 }
 

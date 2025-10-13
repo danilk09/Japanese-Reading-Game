@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <windows.h>
 
 #include "functions.h"
 
@@ -20,6 +21,7 @@ int main(int argc, char* argv[])
     struct node *head = NULL;
     struct node *tail = NULL;
 
+    SetConsoleOutputCP(CP_UTF8);
     setlocale(LC_ALL, "en_US.UTF-8");
 
     printf("Welcome to the Japanese Reading Game!\n"
@@ -57,7 +59,7 @@ int main(int argc, char* argv[])
         printf("%d...\n", i);
     }
     printf("Start!\n"
-    "_______________________\n\n");
+    "_______________________\n");
 
     for(i = 0 && ret_val == 0; i < total_questions; i++)
     {
@@ -105,7 +107,7 @@ int main(int argc, char* argv[])
 
         if (ret_val == 0)
         {
-            printf("Question %d: %s\n", i + 1, question); // Prints a random question from the database
+            printf("\nQuestion %d: %s", i + 1, question); // Prints a random question from the database
 
             start_time = time(NULL);
 
@@ -146,16 +148,16 @@ int main(int argc, char* argv[])
 
                 if (strncmp(user_english, correct_english, 50) == 0)
                 {
-                    curr_score = calculatePoints((int)total_time);
+                    curr_score += calculatePoints((int)total_time);
                     total_score += curr_score;
                 }
                 else
                 {
-                    curr_score = 0;
+                    curr_score += 0;
                 }
             }
 
-            createNode(head, tail, question, correct_romaji, correct_english, user_romaji, user_english, curr_score, 50);
+            createNode(&head, &tail, question, correct_romaji, correct_english, user_romaji, user_english, curr_score, 50);
         }
     }
 
