@@ -1,3 +1,8 @@
+/**
+ * Contains the struct definition of a node and
+ * what information it holds. 
+ */
+
 struct node
 {
     char            question[50];

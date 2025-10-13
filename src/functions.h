@@ -1,6 +1,7 @@
-/*
-Contains the function prototypes of the functions defined in functions.c
-*/
+/**
+ * Contains the function prototypes for the functions
+ * defined in functions.c
+ */
 
 #include "node.h"
 

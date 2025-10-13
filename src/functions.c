@@ -1,3 +1,4 @@
+// Header Files
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,10 +7,15 @@
 
 #include "node.h"
 
-/*
-Calculates the points the user achieved based on how much time the
-user spent on answering the question
-*/
+/**
+ * Calculates the points the user achieved based on how much 
+ * time the user spent on answering the question.
+ * 
+ * Parameters: time (int) : The amount of time the user spent
+ *                          answering the question.
+ * 
+ * Returns: score : The number of points the user gained
+ */
 int calculatePoints(int time)
 {
     int score;
@@ -17,9 +23,13 @@ int calculatePoints(int time)
     return score;
 }
 
-/*
-Clears the buffer
-*/
+/**
+ * Clears the buffer.
+ * 
+ * Parameters: None
+ * 
+ * Returns: Void
+ */
 void clearBuffer()
 {
     char c;
@@ -29,11 +39,27 @@ void clearBuffer()
     } while (c != "\n" && c != EOF);
 }
 
-/*
-Selects the mode of the game depeneding on what the user
-chose. This will specify what database to take information
-from.
-*/
+/**
+ * Selects the mode of the game depeneding on what the user
+ * chose. This will specify what database to take information
+ * from as well as the range of numbers the randomNum function
+ * should generate.
+ * 
+ * Parameters: mode (int *) : The mode of the game
+ *             user_input (char *) : What the user typed
+ *             length (int) : How many characters the user input is
+ *             upper_hir (int *) : The max id number that should be
+ *                                 achieved from the hirigana database
+ *             lower_hir (int *) : The lowest id number that should be
+ *                                 achieved from the hirigana database
+ *             upper_kat (int *) : The max id number that should be
+ *                                 achieved from the katakana database
+ *             lower_kat (int *) : The lowest id number that should be
+ *                                 achieved from the katakana database
+ * 
+ * Returns: 0 : The user successfully chose a mode
+ *         -1 : The user typed an invalid mode
+ */
 int chooseMode(int *mode, char *user_input, int length, int *upper_hir, int *lower_hir, int *upper_kat, int *lower_kat)
 {
     int ret_val = 0;
@@ -86,11 +112,23 @@ int chooseMode(int *mode, char *user_input, int length, int *upper_hir, int *low
     return ret_val;
 }
 
-/*
-Creates a node that stores information about the current
-question the user answered. Alwyas adds the node to the end 
-of the list.
-*/
+/**
+ * Creates a node that stores information about the current question
+ * the user answered. Alwyas adds the node to the end of the linked 
+ * list.
+ * 
+ * Parameters: head (struct node **) : 
+ *             tail (struct node **) :
+ *             question (char []) :
+ *             correct_romaji (char []) :
+ *             correct_english (char []) :
+ *             user_romaji (char []) :
+ *             user_english (char []) :
+ *             points (int) :
+ *             size (int) :
+ * 
+ * Returns: 
+ */
 int createNode(struct node **head, struct node **tail, char question[], char correct_romaji[], char correct_english[], char user_romaji[], char user_english[], int points, int size)
 {
     printf("Got here 0\n");
@@ -127,6 +165,18 @@ int createNode(struct node **head, struct node **tail, char question[], char cor
     return ret_val;
 }
 
+/**
+ * Obtains data from the specified database and column and provides
+ * it to the function that called getData.
+ * 
+ * Parameters: both_mode (int) :
+ *             random (int) :
+ *             database_type (int) :
+ *             info (char []) :
+ *             size (int) :
+ * 
+ * Returns: 
+ */
 int getData(int both_mode, int random, int database_type, char info[], int size)
 {
     int ret_val = 0;
@@ -220,10 +270,19 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
     return ret_val;
 }
 
-/*
-Generates a random number. This number will be used to
-select a random question from the selected database.
-*/
+/**
+ * Generates a random number within a specified range. This number will be 
+ * used to select a random id from the selected database.
+ * 
+ * Parameters: mode (int) :
+ *             upper_hir (int) :
+ *             lower_hir (int) :
+ *             upper_kat (int) :
+ *             lower_kat (int) :
+ *             both_mode (int *) :
+ * 
+ * Returns: 
+ */
 int randomNum(int mode, int upper_hir, int lower_hir, int upper_kat, int lower_kat, int *both_mode)
 {
     int random_num;
@@ -262,12 +321,17 @@ int randomNum(int mode, int upper_hir, int lower_hir, int upper_kat, int lower_k
     return random_num;
 }
 
-/*
-Prints the results of each question, the correct answer
-to the question, the user's answer to the question, how
-many points the user gained for each question, as well as
-their final score.
-*/
+/**
+ * Prints the results of each question, the correct answer to the question, the user's 
+ * answer to the question, how many points the user gained for each question, as well as 
+ * their final score.
+ * 
+ * Parameters: head (struct node *) :
+ *             final_score (int) :
+ *             mode (int) :
+ * 
+ * Returns: 
+ */
 void results(struct node *head, int final_score, int mode)
 {
     int i = 0;
@@ -296,10 +360,15 @@ void results(struct node *head, int final_score, int mode)
     printf("Thank You For Playing!");
 }
 
-/*
-Changes the given input into all lower case letters by
-changing the characters ASCII value.
-*/
+/**
+ * Changes the given input into all lower case letters by changing the 
+ * characters ASCII value.
+ * 
+ * Parameters: input (char []) :
+ *             size (int) :
+ * 
+ * Returns: 
+ */
 void toLower(char input[], int size)
 {
     int i;
