@@ -542,19 +542,19 @@ philosophy
 tenmongaku
 astronomy
 でんきこうがく
-denki koogaku
+denkikoogaku
 electrical engineering
 でんしこうがく
-tenshi koogaku
+denshikoogaku
 electronic engineering
 どうぶつがく
 doobutsugaku
 zoology
 どぼくこうがく
-doboku koogaku
+dobokukoogaku
 civil engineering
 にほんぶんがく
-nihon bungaku
+nihonbungaku
 japanese literature
 びじゅつ
 bijutsu

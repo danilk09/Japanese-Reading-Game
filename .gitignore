@@ -1,2 +1,5 @@
 .vscode
-.gitignore
+.env
+.discord.log
+test.py
+game_output.txt

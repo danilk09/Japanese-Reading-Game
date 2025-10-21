@@ -64,13 +64,13 @@ int chooseMode(int *mode, char *user_input, int length, int *upper_hir, int *low
 {
     int ret_val = 0;
 
-    if(strncmp("hirigana characters", user_input, length) == 0)
+    if(strncmp("hiragana characters", user_input, length) == 0)
     {
         *mode = 0;
         *upper_hir = 104;
         *lower_hir = 1;
     }
-    else if(strncmp("hirigana words", user_input, length) == 0)
+    else if(strncmp("hiragana words", user_input, length) == 0)
     {
         *mode = 1;
         *upper_hir = 273;
@@ -131,7 +131,6 @@ int chooseMode(int *mode, char *user_input, int length, int *upper_hir, int *low
  */
 int createNode(struct node **head, struct node **tail, char question[], char correct_romaji[], char correct_english[], char user_romaji[], char user_english[], int points, int size)
 {
-    printf("Got here 0\n");
     int ret_val = 0;
 
     struct node *new_node = (struct node *)malloc(sizeof(struct node));
@@ -189,7 +188,7 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
 
     if (both_mode == 0)
     {
-        strcpy(db_name, "../../storage/output/hirigana.db");
+        strcpy(db_name, "./storage/output/hirigana.db");
         if (database_type == 0)
         {
             sql = "SELECT Hirigana from hirigana_mode WHERE id = ?";

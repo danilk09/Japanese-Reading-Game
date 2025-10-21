@@ -49,6 +49,8 @@ int main(int argc, char* argv[])
     #endif
     setlocale(LC_ALL, "en_US.UTF-8");
 
+    setbuf(stdout, NULL);
+
     printf("\nWelcome to the Japanese Reading Game!\n"
         "=====================================\n"
         "You can either practice hirigana and katakana characters or reading hirigana and katakana words.\n"
@@ -59,7 +61,7 @@ int main(int argc, char* argv[])
         "wrong when you really didn't, then please forgive me!\n"
         "Please choose one of the game options below to start the game and determine what\n"
         "type of questions will be asked\n"
-        "Hirigana Characters | Hirigana Words | Katakana Characters | Katakana Words | Both Characters | Both Words\n\n");
+        "Hiragana Characters | Hiragana Words | Katakana Characters | Katakana Words | Both Characters | Both Words\n\n");
 
     // Ensures the user selected a valid mode
     while(boolean == 0)
