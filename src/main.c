@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     int curr_score = 0, total_score = 0;
     int ret_val = 0, boolean = 0, total_questions = 10;
 
-    char user_input[10];
+    char user_input[30];
     char question[50];
     char user_romaji[50];
     char user_english[50] = "\0";
@@ -50,6 +50,7 @@ int main(int argc, char* argv[])
     setlocale(LC_ALL, "en_US.UTF-8");
 
     setbuf(stdout, NULL);
+    setvbuf(stdout, NULL, _IONBF, 0);
 
     printf("\nWelcome to the Japanese Reading Game!\n"
         "=====================================\n"
@@ -84,7 +85,7 @@ int main(int argc, char* argv[])
     "_______________________\n");
 
     // Loop for asking each question
-    for(i = 0 && ret_val == 0; i < total_questions; i++)
+    for(i = 0; i < total_questions && ret_val == 0; i++)
     {
         // Generates a random number depending on the mode selected
         // This number relates to the id of the database
@@ -133,7 +134,8 @@ int main(int argc, char* argv[])
 
         if (ret_val == 0)
         {
-            printf("\nQuestion %d: %s", i + 1, question);
+            printf("\nQuestion %d: %s\n", i + 1, question);
+            fflush(stdout);
 
             // Finds out how much time the user spent answering the question
             start_time = time(NULL);
