@@ -80,12 +80,6 @@ int main(int argc, char* argv[])
         //clearBuffer();
     }
 
-    printf("\nGame starts in...\n");
-    for(i = 3; i > 0; i--)
-    {
-        sleep(1);
-        printf("%d...\n", i);
-    }
     printf("Start!\n"
     "_______________________\n");
 

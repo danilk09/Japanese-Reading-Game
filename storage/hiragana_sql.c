@@ -2,13 +2,13 @@
 #include <string.h>
 #include <sqlite3.h>
 
-int create_table(char [], sqlite3 *, char *, int);
-int insert_data(char [], char [], sqlite3 *, int);
+int create_table(char[], sqlite3 *, char *, int);
+int insert_data(char[], char[], sqlite3 *, int);
 
 int main(int argc, char *argv[])
 {
-    char db_name[20] = "hirigana.db";
-    char filename[20] = "../hirigana.txt";
+    char db_name[20] = "hiragana.db";
+    char filename[20] = "../hiragana.txt";
     char *error_messgae;
     sqlite3 *db;
     int ret_val = 0, exit = 0;
@@ -38,9 +38,9 @@ int main(int argc, char *argv[])
 
 int create_table(char db_name[], sqlite3 *db, char *error_message, int exit)
 {
-    char *sql = "CREATE TABLE hirigana_mode ("
+    char *sql = "CREATE TABLE hiragana_mode ("
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, "
-                "Hirigana TEXT NOT NULL, "
+                "Hiragana TEXT NOT NULL, "
                 "Romaji TEXT NOT NULL, "
                 "English TEXT NOT NULL );";
     int ret_val = 0;
@@ -51,7 +51,7 @@ int create_table(char db_name[], sqlite3 *db, char *error_message, int exit)
     {
         ret_val = -1;
     }
-    
+
     if (ret_val == 0)
     {
         exit = sqlite3_exec(db, sql, NULL, 0, &error_message);
@@ -74,14 +74,14 @@ int create_table(char db_name[], sqlite3 *db, char *error_message, int exit)
 
 int insert_data(char db_name[], char filename[], sqlite3 *db, int exit)
 {
-    char hirigana[50];
+    char hiragana[50];
     char romaji[50];
     char english[50];
     int ret_val = 0;
 
     sqlite3_stmt *stmt;
 
-    char *sql = "INSERT INTO hirigana_mode (Hirigana, Romaji, English) VALUES (?, ?, ?);";
+    char *sql = "INSERT INTO hiragana_mode (Hiragana, Romaji, English) VALUES (?, ?, ?);";
 
     FILE *in_file;
     in_file = fopen(filename, "r");
@@ -111,20 +111,20 @@ int insert_data(char db_name[], char filename[], sqlite3 *db, int exit)
 
         while (ret_val != -1)
         {
-            if (fgets(hirigana, 50, in_file) == NULL) 
+            if (fgets(hiragana, 50, in_file) == NULL)
             {
                 break;
             }
-            if (fgets(romaji, 50, in_file) == NULL) 
+            if (fgets(romaji, 50, in_file) == NULL)
             {
                 break;
             }
-            if (fgets(english, 50, in_file) == NULL) 
+            if (fgets(english, 50, in_file) == NULL)
             {
                 break;
             }
 
-            sqlite3_bind_text(stmt, 1, hirigana, -1, SQLITE_STATIC);
+            sqlite3_bind_text(stmt, 1, hiragana, -1, SQLITE_STATIC);
             sqlite3_bind_text(stmt, 2, romaji, -1, SQLITE_STATIC);
             sqlite3_bind_text(stmt, 3, english, -1, SQLITE_STATIC);
 
@@ -134,7 +134,7 @@ int insert_data(char db_name[], char filename[], sqlite3 *db, int exit)
                 fprintf(stderr, "Execution failed: %s\n", sqlite3_errmsg(db));
                 sqlite3_close(db);
                 ret_val = -1;
-            }   
+            }
 
             if (ret_val == 0)
             {

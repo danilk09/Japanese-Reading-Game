@@ -188,18 +188,18 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
 
     if (both_mode == 0)
     {
-        strcpy(db_name, "./storage/output/hirigana.db");
+        strcpy(db_name, "./storage/output/hiragana.db");
         if (database_type == 0)
         {
-            sql = "SELECT Hirigana from hirigana_mode WHERE id = ?";
+            sql = "SELECT Hiragana from hiragana_mode WHERE id = ?";
         }
         else if (database_type == 1)
         {
-            sql = "SELECT Romaji from hirigana_mode WHERE id = ?";
+            sql = "SELECT Romaji from hiragana_mode WHERE id = ?";
         }
         else if (database_type == 2)
         {
-            sql = "SELECT English from hirigana_mode WHERE id = ?";
+            sql = "SELECT English from hiragana_mode WHERE id = ?";
         }
         else
         {
@@ -239,6 +239,7 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
         exit = sqlite3_prepare_v2(db, sql, -1., &stmt, NULL);
         if (exit != SQLITE_OK)
         {
+            printf("Open DB Error: %s\n", sqlite3_errmsg(db));
             sqlite3_close(db);
             ret_val = -1;
         }
