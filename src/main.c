@@ -37,9 +37,7 @@ int main(int argc, char* argv[])
     char user_input[30];
     char question[50];
     char user_romaji[50];
-    char user_english[50] = "\0";
     char correct_romaji[50];
-    char correct_english[50] = "\0";
 
     struct node *head = NULL;
     struct node *tail = NULL;
@@ -57,9 +55,6 @@ int main(int argc, char* argv[])
         "You can either practice hirigana and katakana characters or reading hirigana and katakana words.\n"
         "Type and enter the romaji version of the Japanese character/word as quickly as possible\n"
         "The quicker you type, the more points you gain! Each question is worth up to 20 points.\n"
-        "Bonus questions about the meaning of the word in English will be provided at the end!\n"
-        "Note: I made the English meanings as general as possible. If the game says you got it\n"
-        "wrong when you really didn't, then please forgive me!\n"
         "Please choose one of the game options below to start the game and determine what\n"
         "type of questions will be asked\n"
         "Hiragana Characters | Hiragana Words | Katakana Characters | Katakana Words | Both Characters | Both Words\n\n");
@@ -109,27 +104,17 @@ int main(int argc, char* argv[])
 
         // Obtaining information stored in the database depending on the id randomly generated
         database_type = 0;
-        if (ret_val == 0 && getData(both_mode, random, database_type, question, 50) == -1)
+        if (ret_val != 0 || getData(both_mode, random, database_type, question, 50) == -1)
         {
             printf("Error with obtaining the question from the database\n");
             ret_val = -1;
         }
 
         database_type = 1;
-        if (ret_val == 0 && getData(both_mode, random, database_type, correct_romaji, 50) == -1)
+        if (ret_val != 0 || getData(both_mode, random, database_type, correct_romaji, 50) == -1)
         {
             printf("Error with obtaining the correct romaji from the database\n");
             ret_val = -1;
-        }
-
-        if (ret_val == 0 && (mode == 1 || mode == 3 || mode == 5))
-        {
-            database_type = 2;
-            if (getData(both_mode, random, database_type, correct_english, 50) == -1)
-            {
-                printf("Error with obtaining the correct English from the database\n");
-                ret_val = -1;
-            }
         }
 
         if (ret_val == 0)
@@ -157,39 +142,13 @@ int main(int argc, char* argv[])
                 curr_score = 0;
             }
 
-            // Asks about the English meaning of the word if one of the "words" modes was selected
-            if (mode == 1 || mode == 3 || mode == 5)
-            {
-                printf("Bonus Question! English meaning:\n");
-
-                // Finds out how much time the user spent answering the question
-                start_time = time(NULL);
-                fgets(user_english, 50, stdin);
-                end_time = time(NULL);
-                total_time = difftime(end_time, start_time);
-
-                toLower(user_english, strlen(user_english));
-                //clearBuffer();
-
-                // Determines how many points the user gained
-                if (strncmp(user_english, correct_english, 50) == 0)
-                {
-                    curr_score += calculatePoints((int)total_time);
-                    total_score += curr_score;
-                }
-                else
-                {
-                    curr_score += 0;
-                }
-            }
-
             // Stores information about this specific question into a node associated with a linked list
             // Used for printing the results
-            createNode(&head, &tail, question, correct_romaji, correct_english, user_romaji, user_english, curr_score, 50);
+            createNode(&head, &tail, question, correct_romaji, user_romaji, curr_score, 50);
         }
     }
 
     // Prints the results of the game
-    results(head, total_score, mode);
+    results(head, total_score);
     return ret_val;
 }

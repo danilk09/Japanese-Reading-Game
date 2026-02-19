@@ -41,8 +41,7 @@ int create_table(char db_name[], sqlite3 *db, char *error_message, int exit)
     char *sql = "CREATE TABLE katakana_mode ("
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, "
                 "Katakana TEXT NOT NULL, "
-                "Romaji TEXT NOT NULL, "
-                "English TEXT NOT NULL );";
+                "Romaji TEXT NOT NULL);";
     int ret_val = 0;
 
     exit = sqlite3_open(db_name, &db);
@@ -76,12 +75,11 @@ int insert_data(char db_name[], char filename[], sqlite3 *db, int exit)
 {
     char katakana[50];
     char romaji[50];
-    char english[50];
     int ret_val = 0;
 
     sqlite3_stmt *stmt;
 
-    char *sql = "INSERT INTO katakana_mode (Katakana, Romaji, English) VALUES (?, ?, ?);";
+    char *sql = "INSERT INTO katakana_mode (Katakana, Romaji) VALUES (?, ?);";
 
     FILE *in_file;
     in_file = fopen(filename, "r");
@@ -120,14 +118,9 @@ int insert_data(char db_name[], char filename[], sqlite3 *db, int exit)
             {
                 break;
             }
-            if (fgets(english, 50, in_file) == NULL) 
-            {
-                break;
-            }
 
             sqlite3_bind_text(stmt, 1, katakana, -1, SQLITE_STATIC);
             sqlite3_bind_text(stmt, 2, romaji, -1, SQLITE_STATIC);
-            sqlite3_bind_text(stmt, 3, english, -1, SQLITE_STATIC);
 
             exit = sqlite3_step(stmt);
             if (exit != SQLITE_DONE)

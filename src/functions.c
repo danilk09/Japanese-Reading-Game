@@ -19,7 +19,17 @@
 int calculatePoints(int time)
 {
     int score;
-    score = (20 - (time/2));
+    if (time <= 2) {
+        score = 20;
+    }
+    else if (time > 2 && time <= 12)
+    {
+        score = 20 - ((time - 2) * 2);
+    }
+    else
+    {
+        score = 0;
+    }
     return score;
 }
 
@@ -32,11 +42,8 @@ int calculatePoints(int time)
  */
 void clearBuffer()
 {
-    char c;
-    do
-    {
-        c = fgetc(stdin);
-    } while (c != "\n" && c != EOF);
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
 }
 
 /**
@@ -64,6 +71,8 @@ int chooseMode(int *mode, char *user_input, int length, int *upper_hir, int *low
 {
     int ret_val = 0;
 
+    // Chooses mode based on user input
+    // Sets the upper and lower bounds for the random number generator
     if(strncmp("hiragana characters", user_input, length) == 0)
     {
         *mode = 0;
@@ -117,19 +126,18 @@ int chooseMode(int *mode, char *user_input, int length, int *upper_hir, int *low
  * the user answered. Alwyas adds the node to the end of the linked 
  * list.
  * 
- * Parameters: head (struct node **) : 
- *             tail (struct node **) :
- *             question (char []) :
- *             correct_romaji (char []) :
- *             correct_english (char []) :
- *             user_romaji (char []) :
- *             user_english (char []) :
- *             points (int) :
- *             size (int) :
+ * Parameters: head (struct node **) : Beginning of the linked list
+ *             tail (struct node **) : End of the linked list
+ *             question (char []) : The question provided to the user
+ *             correct_romaji (char []) : The correct romaji answer to the question
+ *             user_romaji (char []) : The user's romaji answer to the question
+ *             points (int) : The points the user gained for the question
+ *             size (int) : The size of the char arrays to prevent buffer overflow
  * 
- * Returns: 
+ * Returns: 0 : The node was successfully created and added to the linked list
+ *         -1 : The node was not successfully created and added to the linked list
  */
-int createNode(struct node **head, struct node **tail, char question[], char correct_romaji[], char correct_english[], char user_romaji[], char user_english[], int points, int size)
+int createNode(struct node **head, struct node **tail, char question[], char correct_romaji[], char user_romaji[], int points, int size)
 {
     int ret_val = 0;
 
@@ -139,13 +147,12 @@ int createNode(struct node **head, struct node **tail, char question[], char cor
         ret_val = -1;
     }
 
+    // Stores information for the question in the new node and adds the node to the end of the linked list
     if (ret_val == 0)
     {
         strncpy(new_node->question, question, size);
         strncpy(new_node->correct_romaji, correct_romaji, size);
-        strncpy(new_node->correct_english, correct_english, size);
         strncpy(new_node->user_romaji, user_romaji, size);
-        strncpy(new_node->user_english, user_english, size);
         new_node->points = points;
         new_node->next = NULL;
 
@@ -168,13 +175,15 @@ int createNode(struct node **head, struct node **tail, char question[], char cor
  * Obtains data from the specified database and column and provides
  * it to the function that called getData.
  * 
- * Parameters: both_mode (int) :
- *             random (int) :
- *             database_type (int) :
- *             info (char []) :
- *             size (int) :
+ * Parameters: both_mode (int) : If one of the both modes were selected, this specifies which database the
+ *                               question is from generating from randomNum
+ *             random (int) : The row to obtain from the database
+ *             database_type (int) : Determines whether to collect question or romaji data
+ *             info (char []) : The char array that the obtained data will be stored in
+ *             size (int) : The size of the char array to prevent buffer overflow
  * 
- * Returns: 
+ * Returns: 0 : The data was successfully obtained from the database
+ *         -1 : The data was not successfully obtained from the database
  */
 int getData(int both_mode, int random, int database_type, char info[], int size)
 {
@@ -186,6 +195,7 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
     int exit;
     char *sql;
 
+    // Sets SQL stataement to choose data from the hiragana database
     if (both_mode == 0)
     {
         strcpy(db_name, "./storage/output/hiragana.db");
@@ -197,15 +207,12 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
         {
             sql = "SELECT Romaji from hiragana_mode WHERE id = ?";
         }
-        else if (database_type == 2)
-        {
-            sql = "SELECT English from hiragana_mode WHERE id = ?";
-        }
         else
         {
             ret_val = -1;
         }
     }
+    // Sets SQL statement to choose data from the katakana database
     else
     {
         strcpy(db_name, "../../storage/output/katakana.db");
@@ -217,10 +224,6 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
         {
             sql = "SELECT Romaji from katakana_mode WHERE id = ?";
         }
-        else if (database_type == 2)
-        {
-            sql = "SELECT English from katakana_mode WHERE id = ?";
-        }
         else
         {
             ret_val = -1;
@@ -230,10 +233,11 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
     exit = sqlite3_open(db_name, &db);
     if (exit)
     {
-        printf("Got here: %s\n", sqlite3_errmsg(db));
+        printf("Error: %s\n", sqlite3_errmsg(db));
         ret_val = -1;
     }
 
+    // Pulls data from the database
     if (ret_val == 0)
     {
         exit = sqlite3_prepare_v2(db, sql, -1., &stmt, NULL);
@@ -274,14 +278,21 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
  * Generates a random number within a specified range. This number will be 
  * used to select a random id from the selected database.
  * 
- * Parameters: mode (int) :
- *             upper_hir (int) :
- *             lower_hir (int) :
- *             upper_kat (int) :
- *             lower_kat (int) :
- *             both_mode (int *) :
+ * Parameters: mode (int) : The mode the user selected which determines the 
+ *                          range of numbers to generate
+ *             upper_hir (int *) : The max id number that should be
+ *                                 achieved from the hirigana database
+ *             lower_hir (int *) : The lowest id number that should be
+ *                                 achieved from the hirigana database
+ *             upper_kat (int *) : The max id number that should be
+ *                                 achieved from the katakana database
+ *             lower_kat (int *) : The lowest id number that should be
+ *                                 achieved from the katakana database
+ *             both_mode (int *) : Determines which database to pull from for 
+ *                                 other functions
  * 
- * Returns: 
+ * Returns: 0 : A random number was successfully generated
+ *        -1 : A random number was not successfully generated
  */
 int randomNum(int mode, int upper_hir, int lower_hir, int upper_kat, int lower_kat, int *both_mode)
 {
@@ -289,6 +300,7 @@ int randomNum(int mode, int upper_hir, int lower_hir, int upper_kat, int lower_k
 
     srand(time(NULL));
 
+    // Generates a random row specific to the database related to the mode
     if (mode == 0 || mode == 1)
     {
         random_num = rand() % (upper_hir - lower_hir + 1) + lower_hir;
@@ -326,13 +338,13 @@ int randomNum(int mode, int upper_hir, int lower_hir, int upper_kat, int lower_k
  * answer to the question, how many points the user gained for each question, as well as 
  * their final score.
  * 
- * Parameters: head (struct node *) :
- *             final_score (int) :
- *             mode (int) :
+ * Parameters: head (struct node *) : The beginning of the linked list that contains the 
+ *                                    information for each question
+ *             final_score (int) : The user's final score at the end of the game
  * 
- * Returns: 
+ * Returns: Void
  */
-void results(struct node *head, int final_score, int mode)
+void results(struct node *head, int final_score)
 {
     int i = 0;
     struct node *iter = head;
@@ -340,17 +352,14 @@ void results(struct node *head, int final_score, int mode)
     printf("\nHere Are Your Results\n"
            "=====================\n");
 
+    // Iterates through the linked list and prints the information for each question
     while (iter != NULL)
     {
         printf("\nQuestion %d: %s", i + 1, iter->question);
         printf("Correct Romaji: %s", iter->correct_romaji);
         printf("Your Romaji Answer: %s", iter->user_romaji);
-        if (mode == 1 || mode == 3 || mode == 5)
-        {
-            printf("Correct English Meaning: %s", iter->correct_english);
-            printf("Your English Meaning Answer: %s", iter->user_english);
-        }
         printf("Points for Question %d: %d\n", i + 1, iter->points);
+        printf("\n");
 
         iter = iter->next;
         i += 1;
@@ -364,10 +373,10 @@ void results(struct node *head, int final_score, int mode)
  * Changes the given input into all lower case letters by changing the 
  * characters ASCII value.
  * 
- * Parameters: input (char []) :
- *             size (int) :
+ * Parameters: input (char []) : The user input
+ *             size (int) : The size of the char array to prevent buffer overflow
  * 
- * Returns: 
+ * Returns: Void
  */
 void toLower(char input[], int size)
 {
