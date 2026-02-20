@@ -143,7 +143,12 @@ async def play(ctx):
         return
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    exe_path = os.path.abspath(os.path.join(script_dir, "..", "src", "output", "main.exe"))
+    root_dir = os.path.abspath(os.path.join(script_dir, ".."))
+
+    if sys.platform == "win32":
+        exe_path = os.path.join(root_dir, "src", "output", "main.exe")
+    else:
+        exe_path = os.path.join(root_dir, "src", "output", "main")
     print(f"Looking for game at: {exe_path}")
 
     try:

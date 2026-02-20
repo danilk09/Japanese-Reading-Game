@@ -5,10 +5,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #include "functions.h"
 
 /**
@@ -42,9 +38,6 @@ int main(int argc, char* argv[])
     struct node *head = NULL;
     struct node *tail = NULL;
 
-    #ifdef _WIN32
-    SetConsoleOutputCP(CP_UTF8);
-    #endif
     setlocale(LC_ALL, "en_US.UTF-8");
 
     setbuf(stdout, NULL);

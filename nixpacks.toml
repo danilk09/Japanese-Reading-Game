@@ -1,0 +1,13 @@
+[phases.setup]
+nixPkgs = ["gcc", "sqlite", "make"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[phases.build]
+cmds = ["make"]
+
+[start]
+cmd = "python discord_bot/jpn_bot.py"
+
+worker: python discord_bot/jpn_bot.py
