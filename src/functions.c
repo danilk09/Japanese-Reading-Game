@@ -76,42 +76,42 @@ int chooseMode(int *mode, char *user_input, int length, int *upper_hir, int *low
     if(strncmp("hiragana characters", user_input, length) == 0)
     {
         *mode = 0;
-        *upper_hir = 104;
+        *upper_hir = 107;
         *lower_hir = 1;
     }
     else if(strncmp("hiragana words", user_input, length) == 0)
     {
         *mode = 1;
-        *upper_hir = 273;
-        *lower_hir = 105;
+        *upper_hir = 345;
+        *lower_hir = 108;
     }
     else if(strncmp("katakana characters", user_input, length) == 0)
     {
         *mode = 2;
-        *upper_kat = 0; // Placeholders for when I create katakana database
-        *lower_kat = 0;
+        *upper_kat = 121; // Placeholders for when I create katakana database
+        *lower_kat = 1;
     }
     else if(strncmp("katakana words", user_input, length) == 0)
     {
         *mode = 3;
-        *upper_kat = 0; // Placeholders for when I create katakana database
-        *lower_kat = 0;
+        *upper_kat = 163; // Placeholders for when I create katakana database
+        *lower_kat = 122;
     }
     else if(strncmp("both characters", user_input, length) == 0)
     {
         *mode = 4;
-        *upper_hir = 104; // Placeholders for when I create katakana database
-        *upper_kat = 0;
+        *upper_hir = 107; // Placeholders for when I create katakana database
+        *upper_kat = 121;
         *lower_hir = 1;
-        *lower_kat = 0;
+        *lower_kat = 1;
     }    
     else if(strncmp("both words", user_input, length) == 0)
     {
         *mode = 5;
-        *upper_hir = 273; // Placeholders for when I create katakana database
-        *upper_kat = 0;
-        *lower_hir = 105;
-        *lower_kat = 0;
+        *upper_hir = 345; // Placeholders for when I create katakana database
+        *upper_kat = 163;
+        *lower_hir = 108;
+        *lower_kat = 122;
     }
     else
     {
@@ -359,7 +359,7 @@ void results(struct node *head, int final_score)
         printf("Correct Romaji: %s", iter->correct_romaji);
         printf("Your Romaji Answer: %s", iter->user_romaji);
         printf("Points for Question %d: %d\n", i + 1, iter->points);
-        printf("\n");
+        printf("---------------------------------------\n");
 
         iter = iter->next;
         i += 1;

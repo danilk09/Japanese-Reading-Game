@@ -2,18 +2,17 @@
 #include <string.h>
 #include <sqlite3.h>
 
-int create_table(char [], sqlite3 *, char *, int);
-int insert_data(char [], char [], sqlite3 *, int);
+int create_table(char[], char **);
+int insert_data(char[], char[]);
 
 int main(int argc, char *argv[])
 {
-    char db_name[20] = "katakana.db";
-    char filename[20] = "../katakana.txt";
-    char *error_messgae;
-    sqlite3 *db;
-    int ret_val = 0, exit = 0;
+    char db_name[] = "katakana.db";
+    char filename[] = "../katakana.txt";
+    char *error_message = NULL;
+    int ret_val = 0;
 
-    if (create_table(db_name, db, error_messgae, exit) == -1)
+    if (create_table(db_name, &error_message) == -1)
     {
         printf("Error creating table\n");
         ret_val = -1;
@@ -23,12 +22,12 @@ int main(int argc, char *argv[])
         printf("Successfully created database table\n");
     }
 
-    if (insert_data(db_name, filename, db, exit) == -1)
+    if (ret_val == 0 && insert_data(db_name, filename) == -1)
     {
         printf("Error inserting data\n");
         ret_val = -1;
     }
-    else
+    else if (ret_val == 0)
     {
         printf("Successfully inserted data\n");
     }
@@ -36,111 +35,96 @@ int main(int argc, char *argv[])
     return ret_val;
 }
 
-int create_table(char db_name[], sqlite3 *db, char *error_message, int exit)
+int create_table(char db_name[], char **error_message)
 {
-    char *sql = "CREATE TABLE katakana_mode ("
+    char *sql = "CREATE TABLE IF NOT EXISTS katakana_mode ("
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, "
                 "Katakana TEXT NOT NULL, "
                 "Romaji TEXT NOT NULL);";
     int ret_val = 0;
+    int rc;
+    sqlite3 *db = NULL;
 
-    exit = sqlite3_open(db_name, &db);
-
-    if (exit)
+    rc = sqlite3_open(db_name, &db);
+    if (rc)
     {
+        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return -1;
+    }
+
+    rc = sqlite3_exec(db, sql, NULL, 0, error_message);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "SQL error: %s\n", *error_message);
+        sqlite3_free(*error_message);
+        sqlite3_close(db);
         ret_val = -1;
     }
-    
-    if (ret_val == 0)
-    {
-        exit = sqlite3_exec(db, sql, NULL, 0, &error_message);
 
-        if (exit)
-        {
-            printf("%s\n", error_message);
-            sqlite3_close(db);
-            ret_val = -1;
-        }
-    }
-
-    if (ret_val == 0)
-    {
-        sqlite3_close(db);
-    }
-
+    sqlite3_close(db);
     return ret_val;
 }
 
-int insert_data(char db_name[], char filename[], sqlite3 *db, int exit)
+int insert_data(char db_name[], char filename[])
 {
     char katakana[50];
     char romaji[50];
     int ret_val = 0;
-
-    sqlite3_stmt *stmt;
+    int rc;
+    sqlite3 *db = NULL;
+    sqlite3_stmt *stmt = NULL;
 
     char *sql = "INSERT INTO katakana_mode (Katakana, Romaji) VALUES (?, ?);";
 
-    FILE *in_file;
-    in_file = fopen(filename, "r");
+    FILE *in_file = fopen(filename, "r");
     if (in_file == NULL)
     {
-        printf("Filename: %s\n", filename);
-        printf("error opening file\n");
-        ret_val = -1;
+        fprintf(stderr, "Error opening file: %s\n", filename);
+        return -1;
     }
 
-    exit = sqlite3_open(db_name, &db);
-
-
-    if (exit)
+    rc = sqlite3_open(db_name, &db);
+    if (rc)
     {
-        ret_val = -1;
-    }
-
-    if (ret_val == 0)
-    {
-        exit = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-        if (exit != SQLITE_OK)
-        {
-            printf("error preparing\n");
-            sqlite3_close(db);
-            ret_val = -1;
-        }
-
-        while (ret_val != -1)
-        {
-            if (fgets(katakana, 50, in_file) == NULL) 
-            {
-                break;
-            }
-            if (fgets(romaji, 50, in_file) == NULL) 
-            {
-                break;
-            }
-
-            sqlite3_bind_text(stmt, 1, katakana, -1, SQLITE_STATIC);
-            sqlite3_bind_text(stmt, 2, romaji, -1, SQLITE_STATIC);
-
-            exit = sqlite3_step(stmt);
-            if (exit != SQLITE_DONE)
-            {
-                fprintf(stderr, "Execution failed: %s\n", sqlite3_errmsg(db));
-                sqlite3_close(db);
-                ret_val = -1;
-            }   
-
-            sqlite3_reset(stmt);
-            sqlite3_clear_bindings(stmt);
-        }
-        sqlite3_finalize(stmt);
-    }
-
-    if (ret_val == 0)
-    {
+        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
         fclose(in_file);
+        return -1;
     }
+
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "Error preparing statement: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        fclose(in_file);
+        return -1;
+    }
+
+    while (1)
+    {
+        if (fgets(katakana, sizeof(katakana), in_file) == NULL) break;
+        if (fgets(romaji,   sizeof(romaji),   in_file) == NULL) break;
+
+        sqlite3_bind_text(stmt, 1, katakana, -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 2, romaji,   -1, SQLITE_TRANSIENT);
+
+        rc = sqlite3_step(stmt);
+        if (rc != SQLITE_DONE)
+        {
+            fprintf(stderr, "Execution failed: %s\n", sqlite3_errmsg(db));
+            ret_val = -1;
+            break;
+        }
+
+        sqlite3_reset(stmt);
+        sqlite3_clear_bindings(stmt);
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    fclose(in_file);
 
     return ret_val;
 }

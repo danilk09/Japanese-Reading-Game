@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     }
 
     printf("Start!\n"
-    "_______________________\n");
+    "============\n");
 
     // Loop for asking each question
     for(i = 0; i < total_questions && ret_val == 0; i++)
