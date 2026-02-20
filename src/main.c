@@ -53,8 +53,11 @@ int main(int argc, char* argv[])
     printf("\nWelcome to the Japanese Reading Game!\n"
         "=====================================\n"
         "You can either practice hirigana and katakana characters or reading hirigana and katakana words.\n"
-        "Type and enter the romaji version of the Japanese character/word as quickly as possible\n"
+        "Type and enter the romaji version of the Japanese character/word as quickly as possible!\n"
         "The quicker you type, the more points you gain! Each question is worth up to 20 points.\n"
+        "Answering the question in 2 seconds or less will give you the full 20 points, and every second\n"
+        "after that will decrease the points gained by 2 until you reach eitehr 1 point for a correct answer\n"
+        "or 0 points for an incorrect answer.\n"
         "Please choose one of the game options below to start the game and determine what\n"
         "type of questions will be asked\n"
         "Hiragana Characters | Hiragana Words | Katakana Characters | Katakana Words | Both Characters | Both Words\n\n");
@@ -76,8 +79,8 @@ int main(int argc, char* argv[])
         //clearBuffer();
     }
 
-    printf("Start!\n"
-    "============\n");
+    printf("   Start!\n"
+           "============\n");
 
     // Loop for asking each question
     for(i = 0; i < total_questions && ret_val == 0; i++)

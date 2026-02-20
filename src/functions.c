@@ -28,7 +28,7 @@ int calculatePoints(int time)
     }
     else
     {
-        score = 0;
+        score = 1;
     }
     return score;
 }
@@ -88,19 +88,19 @@ int chooseMode(int *mode, char *user_input, int length, int *upper_hir, int *low
     else if(strncmp("katakana characters", user_input, length) == 0)
     {
         *mode = 2;
-        *upper_kat = 121; // Placeholders for when I create katakana database
+        *upper_kat = 121;
         *lower_kat = 1;
     }
     else if(strncmp("katakana words", user_input, length) == 0)
     {
         *mode = 3;
-        *upper_kat = 163; // Placeholders for when I create katakana database
+        *upper_kat = 163;
         *lower_kat = 122;
     }
     else if(strncmp("both characters", user_input, length) == 0)
     {
         *mode = 4;
-        *upper_hir = 107; // Placeholders for when I create katakana database
+        *upper_hir = 107;
         *upper_kat = 121;
         *lower_hir = 1;
         *lower_kat = 1;
@@ -108,7 +108,7 @@ int chooseMode(int *mode, char *user_input, int length, int *upper_hir, int *low
     else if(strncmp("both words", user_input, length) == 0)
     {
         *mode = 5;
-        *upper_hir = 345; // Placeholders for when I create katakana database
+        *upper_hir = 345;
         *upper_kat = 163;
         *lower_hir = 108;
         *lower_kat = 122;
@@ -215,7 +215,7 @@ int getData(int both_mode, int random, int database_type, char info[], int size)
     // Sets SQL statement to choose data from the katakana database
     else
     {
-        strcpy(db_name, "../../storage/output/katakana.db");
+        strcpy(db_name, "./storage/output/katakana.db");
         if (database_type == 0)
         {
             sql = "SELECT Katakana from katakana_mode WHERE id = ?";
@@ -317,12 +317,12 @@ int randomNum(int mode, int upper_hir, int lower_hir, int upper_kat, int lower_k
         if (random_num % 2 == 0)
         {
             *both_mode = 0;
-            random_num = rand() % (upper_hir - lower_hir + 1) - lower_hir;
+            random_num = rand() % (upper_hir - lower_hir + 1) + lower_hir;
         }
         else
         {
             *both_mode = 1;
-            random_num = rand() % (upper_kat - lower_kat + 1) - lower_kat;
+            random_num = rand() % (upper_kat - lower_kat + 1) + lower_kat;
         }
     }
     else

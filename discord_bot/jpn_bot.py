@@ -56,7 +56,8 @@ async def on_message(message):
             await process.stdin.drain()
 
             received = await read_game_output(game['stdout_reader'], message.author, first_line_timeout=3.0, next_line_timeout=0.05)
-            if not received:
+            await check_and_cleanup(message.author.id, message.author)
+            if not received and message.author.id in active_games:
                 await message.author.send("⚠️ No response from game. The game may have ended.")
 
         except Exception as e:
@@ -71,6 +72,14 @@ async def on_message(message):
             if message.author.id in active_games:
                 active_games[message.author.id]['waiting_for_output'] = False
 
+async def check_and_cleanup(user_id, user):
+    """Check if the game process has ended and clean up if so."""
+    if user_id not in active_games:
+        return
+    process = active_games[user_id]['process']
+    if process.returncode is not None:
+        del active_games[user_id]
+        await user.send("Game over! Thanks for playing. Type `!play` to start a new game. 🎮")
 
 async def read_game_output(reader, user, first_line_timeout=3.0, next_line_timeout=0.3):
     """Read lines from asyncio StreamReader until idle, then send to user."""
@@ -158,6 +167,7 @@ async def play(ctx):
 
         active_games[ctx.author.id]['waiting_for_output'] = True
         await read_game_output(process.stdout, ctx.author, first_line_timeout=2.0, next_line_timeout=0.05)
+        await check_and_cleanup(ctx.author.id, ctx.author)
         active_games[ctx.author.id]['waiting_for_output'] = False
 
     except FileNotFoundError:
