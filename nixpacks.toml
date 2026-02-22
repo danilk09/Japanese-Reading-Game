@@ -9,5 +9,3 @@ cmds = ["make"]
 
 [start]
 cmd = "python discord_bot/jpn_bot.py"
-
-worker: python discord_bot/jpn_bot.py
