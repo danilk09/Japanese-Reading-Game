@@ -1,5 +1,6 @@
 [phases.setup]
-nixPkgs = ["gcc", "sqlite", "sqlite.dev"]
+nixPkgs = ["gcc"]
+aptPkgs = ["libsqlite3-dev"]
 
 [phases.install]
 cmds = [
