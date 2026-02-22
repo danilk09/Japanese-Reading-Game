@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["gcc", "sqlite"]
+nixPkgs = ["gcc", "sqlite", "sqlite.dev"]
 
 [phases.install]
 cmds = [
