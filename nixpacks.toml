@@ -2,10 +2,12 @@
 nixPkgs = ["gcc", "sqlite", "make"]
 
 [phases.install]
-cmds = ["pip install -r requirements.txt"]
-
-[phases.build]
-cmds = ["make"]
+cmds = [
+    "pip install -r requirements.txt",
+    "mkdir -p src/output",
+    "gcc src/main.c src/functions.c -I src -o src/output/main -lsqlite3",
+    "chmod +x src/output/main"
+]
 
 [start]
 cmd = "python discord_bot/jpn_bot.py"
