@@ -8,6 +8,3 @@ cmds = [
     "gcc src/main.c src/functions.c -I src -o src/output/main -lsqlite3",
     "chmod +x src/output/main"
 ]
-
-[start]
-cmd = "python discord_bot/jpn_bot.py"

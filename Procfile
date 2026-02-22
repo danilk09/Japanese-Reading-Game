@@ -1,0 +1,1 @@
+worker: python discord_bot/jpn_bot.py
