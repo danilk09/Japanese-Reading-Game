@@ -3,8 +3,10 @@ nixPkgs = ["gcc", "sqlite"]
 
 [phases.install]
 cmds = [
-    "pip3 install -r requirements.txt",
     "mkdir -p src/output",
     "gcc src/main.c src/functions.c -I src -o src/output/main -lsqlite3",
     "chmod +x src/output/main"
 ]
+
+[phases.build]
+cmds = ["echo Build complete"]
