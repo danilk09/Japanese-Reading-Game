@@ -1,9 +1,9 @@
 [phases.setup]
-nixPkgs = ["gcc", "sqlite", "python311", "python311Packages.pip"]
+nixPkgs = ["gcc", "sqlite"]
 
 [phases.install]
 cmds = [
-    "pip install -r requirements.txt",
+    "pip3 install -r requirements.txt",
     "mkdir -p src/output",
     "gcc src/main.c src/functions.c -I src -o src/output/main -lsqlite3",
     "chmod +x src/output/main"
